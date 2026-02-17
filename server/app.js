@@ -15,7 +15,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 
 //DB Connection
-const db = require("./firebase/config.js");
+//const db = require("./config/firebase.js");
 
 //Routes
 //app.use(router);
