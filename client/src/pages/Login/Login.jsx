@@ -7,8 +7,8 @@ import { validateEmail } from "../../hooks/useValidationEmail";
 import styles from "./Login.module.css";
 
 const Login = () => {
-  const [displayEmail, setDisplayEmail] = useState("");
-  const [displayPassWord, setDisplayPassWord] = useState("");
+  const [email, setEmail] = useState("");
+  const [passWord, setPassWord] = useState("");
   const [error, setError] = useState("");
   const [errorMessage, setErrorMessage] = useState({});
   const { login, error: authenticationError, loading } = useAuthentication();
@@ -20,18 +20,18 @@ const Login = () => {
     let validationErrors = {}; // Objeto para armazenar erros locais
 
     const user = {
-      displayEmail,
-      displayPassWord,
+      email,
+      passWord,
     };
 
-    if (!displayEmail.trim()) {
-      validationErrors.displayEmail = "E-mail é obrigatório.";
-    } else if (!validateEmail(displayEmail.trim())) {
-      validationErrors.displayEmail = "Por favor, insira um e-mail válido.";
+    if (!email.trim()) {
+      validationErrors.email = "E-mail é obrigatório.";
+    } else if (!validateEmail(email.trim())) {
+      validationErrors.email = "Por favor, insira um e-mail válido.";
     }
 
-    if (!displayPassWord.trim()) {
-      validationErrors.displayPassWord = "Senha é obrigatória.";
+    if (!passWord.trim()) {
+      validationErrors.passWord = "Senha é obrigatória.";
     }
 
     if (Object.keys(validationErrors).length > 0) {
@@ -42,8 +42,7 @@ const Login = () => {
     setErrorMessage({}); // Limpa os erros se tudo estiver válido
 
     try {
-      const response = await login(user);
-      console.log("response", response);
+      await login(user);
     } catch (error) {
       setError("Erro ao Entrar. Tente novamente.");
     }
@@ -64,30 +63,30 @@ const Login = () => {
           <span>Email:</span>
           <input
             type="email"
-            name="displayEmail"
+            name="email"
             placeholder="Email do Usuário"
-            value={displayEmail}
-            onChange={(e) => setDisplayEmail(e.target.value)}
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
           />
         </label>
-        {errorMessage.displayEmail && (
+        {errorMessage.email && (
           <div className="errormsg">
-            <p>{errorMessage.displayEmail}</p>
+            <p>{errorMessage.email}</p>
           </div>
         )}
         <label>
           <span>Senha:</span>
           <input
             type="password"
-            name="displayPassWord"
+            name="passWord"
             placeholder="Senha do Usuário"
-            value={displayPassWord}
-            onChange={(e) => setDisplayPassWord(e.target.value)}
+            value={passWord}
+            onChange={(e) => setPassWord(e.target.value)}
           />
         </label>
-        {errorMessage.displayPassWord && (
+        {errorMessage.passWord && (
           <div className="errormsg">
-            <p>{errorMessage.displayPassWord}</p>
+            <p>{errorMessage.passWord}</p>
           </div>
         )}
 

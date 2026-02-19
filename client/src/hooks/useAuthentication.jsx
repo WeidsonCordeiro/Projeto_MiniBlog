@@ -7,7 +7,6 @@ import {
   signOut,
 } from "firebase/auth";
 import { useState, useEffect } from "react";
-import { db } from "../firebase/config";
 
 export const useAuthentication = () => {
   //Cleanup
@@ -35,7 +34,7 @@ export const useAuthentication = () => {
       const { user } = await createUserWithEmailAndPassword(
         auth,
         data.displayEmail,
-        data.displayPassWord,
+        data.displayPassWord
       );
       await updateProfile(user, { displayName: data.displayName });
       return user;
@@ -63,25 +62,38 @@ export const useAuthentication = () => {
     checkIfIsCancelled();
     setLoading(true);
     setError(null);
+
     try {
       const { user } = await signInWithEmailAndPassword(
         auth,
-        data.displayEmail,
-        data.displayPassWord,
+        data.email,
+        data.passWord
       );
+
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          name: user.displayName,
+          uid: user.uid,
+          token: user.accessToken,
+        })
+      );
+
       return user;
     } catch (error) {
-      let systemErrorMessage;
-      console.error(error.message);
-      if (error.message.includes("user-not-found")) {
-        systemErrorMessage = "Usuário não encontrado";
-      } else if (error.message.includes("wrong-password")) {
-        systemErrorMessage = "Senha incorreta";
-      } else {
-        systemErrorMessage =
-          "Ocorreu um erro ao buscar o usuário, tente novamente";
-      }
-      setError(systemErrorMessage);
+      console.error("Erro no login:", error.code);
+
+      const errorMessages = {
+        "auth/user-not-found": "Usuário não encontrado",
+        "auth/wrong-password": "Senha incorreta",
+        "auth/invalid-email": "Email inválido",
+      };
+
+      setError(
+        errorMessages[error.code] ||
+          "Ocorreu um erro ao buscar o usuário, tente novamente"
+      );
+      return null;
     } finally {
       setLoading(false);
     }
@@ -94,6 +106,7 @@ export const useAuthentication = () => {
 
     try {
       await signOut(auth);
+      localStorage.removeItem("user");
     } catch (error) {
       setError(error.message);
     } finally {

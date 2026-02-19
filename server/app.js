@@ -26,11 +26,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ errors: [err.message] });
 });
 
-// Test route under /api
-app.get("/api", (req, res) => {
-  res.send("API is working!");
-});
-
 app.listen(port, () => {
   console.log(`🚀 Server run in http://localhost:${port}`);
 });
