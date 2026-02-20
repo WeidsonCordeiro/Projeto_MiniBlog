@@ -18,7 +18,7 @@ app.use("/uploads", express.static(path.join(__dirname, "/uploads")));
 //const db = require("./config/firebase.js");
 
 //Routes
-//app.use(router);
+app.use(router);
 
 //Middleware de Tratamento de Erros Global:
 app.use((err, req, res, next) => {

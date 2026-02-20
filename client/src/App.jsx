@@ -24,7 +24,7 @@ function App() {
   const [user, setUser] = useState(undefined);
   const { auth } = useAuthentication();
   const loading = user === undefined;
-  console.log(auth);
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(
       auth,

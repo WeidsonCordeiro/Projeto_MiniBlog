@@ -70,12 +70,14 @@ export const useAuthentication = () => {
         data.passWord
       );
 
+      const token = await auth.currentUser.getIdToken(true); // força refresh
+      console.log(token);
+
       localStorage.setItem(
         "user",
         JSON.stringify({
           name: user.displayName,
-          uid: user.uid,
-          token: user.accessToken,
+          token: token,
         })
       );
 

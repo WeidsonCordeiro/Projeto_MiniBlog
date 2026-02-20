@@ -1,31 +1,38 @@
 const Post = require("../models/Post");
+const { db } = require("../config/firebase");
 
 //Register Post
 const setPost = async (req, res) => {
+  console.log("setPost :", req.user);
   try {
     // Validate request body
-    const { userId, description } = req.body;
+    const { title, body, tags } = req.body;
     const img = req.file ? req.file.filename : null;
-    if (!userId || !description) {
-      return res
-        .status(400)
-        .json({ errors: ["Campos obrigatórios não foram preenchidos!"] });
-    }
 
     // Create new post
     const newPost = new Post({
-      userId,
-      description,
+      title,
       img,
+      body,
+      tags: tags || [],
+      userId: req.user.uid,
+      createdBy: req.user.name,
+      createdAt: new Date(),
     });
+    console.log("New Post:", newPost);
+    const docRef = await db.collection("posts").add(newPost);
 
-    const savedPost = await newPost.save();
-    res.status(201).json(savedPost);
+    console.log("Post registrado com sucesso! ID:", docRef);
+
+    res.status(201).json({
+      id: docRef.id,
+      ...newPost,
+    });
   } catch (error) {
     console.error("Erro ao registar Post:", error);
     return res
       .status(500)
-      .json({ errors: ["Erro ao registar Post!"], details: error.message });
+      .json({ errors: ["Erro ao registar Post!"], details: [error.message] });
   }
 };
 

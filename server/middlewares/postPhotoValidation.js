@@ -19,12 +19,12 @@ const postPhotoInsertValidation = () => {
       .bail()
       .isLength({ min: 3 })
       .withMessage("A descrição deve ter pelo menos 3 caracteres!"),
-    // body("img").custom((value, { req }) => {
-    //   if (!req.file) {
-    //     throw new Error("A imagem é obrigatória!");
-    //   }
-    //   return true;
-    // }),
+    body("img").custom((value, { req }) => {
+      if (!req.file) {
+        throw new Error("A imagem é obrigatória!");
+      }
+      return true;
+    }),
   ];
 };
 

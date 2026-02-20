@@ -1,12 +1,12 @@
 class Post {
-  constructor(title, image, body, tags, userId, createdBy) {
+  constructor({ title, img, body, tags, userId, createdBy, createdAt }) {
     this.title = title;
-    this.image = image;
+    this.img = img;
     this.body = body;
-    this.tags = tags || [];
+    this.tags = tags;
     this.userId = userId;
     this.createdBy = createdBy;
-    this.createdAt = Timestamp.now();
+    this.createdAt = createdAt;
   }
 }
 
