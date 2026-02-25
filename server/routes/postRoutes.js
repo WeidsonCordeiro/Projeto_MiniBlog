@@ -4,11 +4,11 @@ const router = express.Router();
 //Controller
 const {
   setPost,
-  //   updatePost,
-  //   deletePost,
-  //   getPosts,
-  //   getAllPostsByUserId,
-  //   getAllPostsByUserName,
+  updatePost,
+  deletePost,
+  getAllPosts,
+  getPostById,
+  getMyPosts,
 } = require("../controllers/postControllers");
 
 //Middleware
@@ -27,13 +27,12 @@ router.post(
   imageUpload.single("img"),
   postPhotoInsertValidation(),
   validate,
-  setPost
+  setPost,
 );
-
-// router.put("/:id", autGuard, postPhotoUpdateValidation(), validate, updatePost);
-// router.delete("/:id", autGuard, deletePost);
-// router.get("/:id", autGuard, validate, getPosts);
-// router.get("/timeline/:userId", autGuard, validate, getAllPostsByUserId);
-// router.get("/profile/:userName", autGuard, validate, getAllPostsByUserName);
+router.get("/", validate, getAllPosts);
+router.get("/myPosts", autGuard, validate, getMyPosts);
+router.put("/:id", autGuard, postPhotoUpdateValidation(), validate, updatePost);
+router.delete("/:id", autGuard, deletePost);
+router.get("/:id", autGuard, validate, getPostById);
 
 module.exports = router;

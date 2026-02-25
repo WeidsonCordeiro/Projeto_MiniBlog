@@ -1,12 +1,26 @@
 class Post {
-  constructor({ title, img, body, tags, userId, createdBy, createdAt }) {
-    this.title = title;
-    this.img = img;
-    this.body = body;
-    this.tags = tags;
-    this.userId = userId;
-    this.createdBy = createdBy;
-    this.createdAt = createdAt;
+  static build({ title, img, body, tags, userId, createdBy }) {
+    return {
+      title,
+      img,
+      body,
+      tags: tags || [],
+      userId,
+      createdBy,
+      createdAt: new Date(),
+    };
+  }
+  static buildUpdate({ title, img, body, tags }) {
+    const updateData = {};
+
+    if (title) updateData.title = title;
+    if (body) updateData.body = body;
+    if (tags) updateData.tags = tags;
+    if (img) updateData.img = img;
+
+    updateData.updatedAt = new Date();
+
+    return updateData;
   }
 }
 

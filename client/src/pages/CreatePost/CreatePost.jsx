@@ -69,7 +69,7 @@ const CreatePost = () => {
 
     const post = {
       title,
-      img,
+      img: image,
       body,
       tagsArray,
       uid: user.uid,
