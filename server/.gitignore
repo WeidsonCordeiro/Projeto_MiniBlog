@@ -1,6 +1,5 @@
 # dependencies
 node_modules
-.env
 serviceAccountKey.json
 
 # testing
