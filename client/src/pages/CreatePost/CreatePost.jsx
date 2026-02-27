@@ -1,54 +1,86 @@
 //Components
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuthContext } from "../../hooks/useAuthContext";
-import { useInsertDocument } from "../../hooks/useInsertDocument";
+import { useAuth } from "../../hooks/useAuth";
+
+//Utils
+import { requestConfig, getToLocalStorage } from "../../../utils/config";
 
 //Css
 import styles from "./CreatePost.module.css";
 
 const CreatePost = () => {
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
+  const [image, setImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [body, setBody] = useState("");
-  const [tags, setTags] = useState([]);
-  const [formError, setFormError] = useState("");
+  const [tags, setTags] = useState("");
+  const [error, setError] = useState("");
   const [errorMessage, setErrorMessage] = useState({});
-  const {
-    insertDocument,
-    loading,
-    error: errorInsertDocument,
-    data,
-  } = useInsertDocument("posts");
-  const { user } = useAuthContext();
+  const [loading, setLoading] = useState(false);
+
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  const handleFile = (e) => {
+    const selectedFile = e.target.files[0];
+
+    if (!selectedFile) return;
+
+    if (!selectedFile.type.startsWith("image/")) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        image: "Selecione apenas imagens.",
+      }));
+      return;
+    }
+
+    // Validar tamanho (máximo 5MB)
+    if (selectedFile.size > 2 * 1024 * 1024) {
+      setErrorMessage((prev) => ({
+        ...prev,
+        image: "A imagem deve ter no máximo 2MB.",
+      }));
+      return;
+    }
+
+    setImage(selectedFile);
+
+    // Criar preview da imagem
+    const previewUrl = URL.createObjectURL(selectedFile);
+    setImagePreview(previewUrl);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     const formClean = () => {
       setTitle("");
-      setImage("");
+      setImage(null);
+      setImagePreview(null);
       setBody("");
       setTags("");
     };
 
-    setFormError("");
-    let validationErrors = {}; // Objeto para armazenar erros locais
+    setLoading(true);
+    setError("");
+
+    let validationErrors = {};
 
     if (!title.trim()) {
       validationErrors.title = "Titulo é obrigatório.";
     }
 
-    if (!image.trim()) {
-      validationErrors.image = "URL da imagem é obrigatório.";
-    } else {
-      try {
-        new URL(image);
-      } catch (error) {
-        validationErrors.image = "A URL da imagem é inválida.";
-      }
+    if (image === null) {
+      validationErrors.image = "Imagem é obrigatório.";
     }
+    // else {
+    //   try {
+    //     new URL(img);
+    //   } catch (error) {
+    //     validationErrors.img = "A URL da imagem é inválida.";
+    //   }
+    //}
 
     if (!body.trim()) {
       validationErrors.body = "Conteudo é obrigatório.";
@@ -63,25 +95,64 @@ const CreatePost = () => {
       return;
     }
 
-    setErrorMessage({}); // Limpa os erros se tudo estiver válido
+    setErrorMessage({});
 
-    const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
+    const tagsArray = tags
+      .split(",")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag !== "");
 
     const post = {
       title,
-      img: image,
       body,
-      tagsArray,
-      uid: user.uid,
-      createdBy: user.displayName,
+      tags: tagsArray,
+      userId: user.userId,
+      createdBy: user.name,
     };
 
+    const formData = new FormData();
+
+    formData.append("title", title);
+    formData.append("body", body);
+    formData.append("userId", user.userId);
+    formData.append("createdBy", user.name);
+
+    tagsArray.forEach((tag) => {
+      formData.append("tags[]", tag);
+    });
+
+    if (image instanceof File) {
+      formData.append("img", image);
+    }
+
+    // Listando o conteúdo do FormData
+    for (let [key, value] of formData.entries()) {
+      if (value instanceof File) {
+        console.log(`${key}: ${value.name}`);
+      } else {
+        console.log(`${key}: ${value}`);
+      }
+    }
+
+    const token = getToLocalStorage("user")?.token;
+    const config = requestConfig("POST", formData, token);
     try {
-      insertDocument(post);
+      const res = await fetch(`/api/posts/newPost`, config);
+      const result = await res.json();
+
+      if (result.errors) {
+        console.log("Erros", result.errors);
+        setError(result.errors);
+        return;
+      }
+      console.log("Post criado com sucesso:", result);
       formClean();
       navigate("/");
     } catch (error) {
-      setFormError("Erro ao criar Posts. Tente novamente.");
+      console.error("Erro ao registar post:", error);
+      setError("Erro ao registar Post. Tente novamente.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -107,26 +178,45 @@ const CreatePost = () => {
             <p>{errorMessage.title}</p>
           </div>
         )}
-        <label>
-          <span>URL da imagem:</span>
-          <input
-            type="text"
-            name="image"
-            placeholder="Insira uma imagem que representa o seu post"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-          />
-        </label>
+        <div className={styles.fileUpload}>
+          <label
+            htmlFor="file"
+            className={styles.uploadBox}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              handleFile({ target: { files: e.dataTransfer.files } });
+            }}
+          >
+            {imagePreview ? (
+              <>
+                <button
+                  type="button"
+                  className={styles.removeImageBtn}
+                  onClick={() => {
+                    setImage(null);
+                    setImagePreview(null);
+                  }}
+                >
+                  ✕
+                </button>
+                <img src={imagePreview} alt="Preview" />
+              </>
+            ) : (
+              <div className={styles.placeholder}>
+                <span>📷</span>
+                <p>Clique para selecionar uma imagem</p>
+                <small>até 2MB</small>
+              </div>
+            )}
+          </label>
+
+          <input type="file" id="file" accept="image/*" onChange={handleFile} />
+        </div>
         {errorMessage.image && (
           <div className="errormsg">
             <p>{errorMessage.image}</p>
           </div>
-        )}
-        {image && (
-          <>
-            <p className={styles.preview_title}>Preview da imagem atual!</p>
-            <img className={styles.preview_image} src={image} alt={title} />
-          </>
         )}
         <label>
           <span>Conteúdo:</span>
@@ -163,8 +253,6 @@ const CreatePost = () => {
             Aguarde...
           </button>
         )}
-        {errorInsertDocument && <p className="error">{errorInsertDocument}</p>}
-        {/* {formError && <p className='error'>{formError}</p>} */}
       </form>
     </div>
   );

@@ -17,7 +17,7 @@ const Login = () => {
     e.preventDefault();
 
     setError("");
-    let validationErrors = {}; // Objeto para armazenar erros locais
+    let validationErrors = {};
 
     const user = {
       email,
@@ -39,7 +39,7 @@ const Login = () => {
       return;
     }
 
-    setErrorMessage({}); // Limpa os erros se tudo estiver válido
+    setErrorMessage({});
 
     try {
       await login(user);

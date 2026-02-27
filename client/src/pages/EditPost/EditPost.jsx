@@ -1,41 +1,62 @@
 //Components
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { useAuthContext } from "../../hooks/useAuthContext";
-import { useUpdateDocument } from "../../hooks/useUpdateDocument";
-import { useFetchDocument } from "../../hooks/useFetchDocument";
+
+//Utils
+import { requestConfig, getToLocalStorage } from "../../../utils/config";
+
+//Material UI
+import { CircularProgress } from "@mui/material";
 
 //Css
 import styles from "./EditPost.module.css";
 
 const EditPost = () => {
-  const { id } = useParams();
-  const { document: post, loading: loading_fetchDocument } = useFetchDocument(
-    "posts",
-    id,
-  );
-
+  const [post, setPost] = useState(null);
   const [title, setTitle] = useState("");
-  const [image, setImage] = useState("");
+  const [imagePreview, setImagePreview] = useState(null);
   const [body, setBody] = useState("");
   const [tags, setTags] = useState([]);
-  const [formError, setFormError] = useState("");
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState({});
-  const {
-    updateDocument,
-    loading,
-    error: errorUpdateDocument,
-    data,
-  } = useUpdateDocument("posts");
-  const { user } = useAuthContext();
+  const { id } = useParams();
+
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      setLoading(true);
+      setError(null);
+
+      const config = requestConfig("GET", null, null);
+      try {
+        const res = await fetch(`/api/posts/${id}`, config);
+        const result = await res.json();
+
+        if (result.errors) {
+          console.log("Erros", result.errors);
+          setError(result.errors);
+          return;
+        }
+
+        setPost(result.post);
+      } catch (error) {
+        console.error("Erro ao buscar post po id:", error);
+        setError("Erro ao buscar post. Tente novamente!");
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPost();
+  }, []);
 
   useEffect(() => {
     if (post) {
       setTitle(post.title);
       setBody(post.body);
-      setImage(post.image);
-      setTags(post.tagsArray.join(", "));
+      setImagePreview(post.img);
+      setTags(post.tags.join(", "));
     }
   }, [post]);
 
@@ -44,26 +65,18 @@ const EditPost = () => {
 
     const formClean = () => {
       setTitle("");
-      setImage("");
+      setImagePreview(null);
       setBody("");
       setTags("");
     };
 
-    setFormError("");
+    setLoading(true);
+    setError("");
+
     let validationErrors = {}; // Objeto para armazenar erros locais
 
     if (!title.trim()) {
       validationErrors.title = "Titulo é obrigatório.";
-    }
-
-    if (!image.trim()) {
-      validationErrors.image = "URL da imagem é obrigatório.";
-    } else {
-      try {
-        new URL(image);
-      } catch (error) {
-        validationErrors.image = "A URL da imagem é inválida.";
-      }
     }
 
     if (!body.trim()) {
@@ -81,28 +94,45 @@ const EditPost = () => {
 
     setErrorMessage({}); // Limpa os erros se tudo estiver válido
 
-    const tagsArray = tags.split(",").map((tag) => tag.trim().toLowerCase());
+    const tagsArray = tags
+      .split(",")
+      .map((tag) => tag.trim().toLowerCase())
+      .filter((tag) => tag !== "");
 
     const post = {
       title,
-      img: image,
       body,
-      tagsArray,
-      uid: user.uid,
-      createdBy: user.displayName,
+      tags: tagsArray,
     };
 
+    const token = getToLocalStorage("user")?.token;
+    const config = requestConfig("PUT", post, token);
     try {
-      updateDocument(id, post);
+      const res = await fetch(`/api/posts/${id}`, config);
+      const result = await res.json();
+
+      if (result.errors) {
+        console.log("Erros", result.errors);
+        setError(result.errors);
+        return;
+      }
+
       formClean();
       navigate("/dashboard");
     } catch (error) {
-      setFormError("Erro ao alterar o Post. Tente novamente!");
+      setError("Erro ao alterar o Post. Tente novamente!");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className={styles.editPost}>
+      {loading && (
+        <div className={styles.loading}>
+          <CircularProgress color="black" size={40} />
+        </div>
+      )}
       {post && (
         <>
           <h2>Editando Post: {post.title}</h2>
@@ -125,25 +155,10 @@ const EditPost = () => {
                 <p>{errorMessage.title}</p>
               </div>
             )}
-            <label>
-              <span>URL da imagem:</span>
-              <input
-                type="text"
-                name="image"
-                placeholder="Insira uma imagem que representa o seu post"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              />
-            </label>
-            {errorMessage.image && (
-              <div className="errormsg">
-                <p>{errorMessage.image}</p>
-              </div>
-            )}
             <p className={styles.preview_title}>Preview da imagem atual!</p>
             <img
               className={styles.preview_image}
-              src={post.image}
+              src={`${import.meta.env.VITE_API_URL}${"/uploads/posts/"}${imagePreview}`}
               alt={post.title}
             />
             <label>
@@ -181,10 +196,6 @@ const EditPost = () => {
                 Aguarde...
               </button>
             )}
-            {errorUpdateDocument && (
-              <p className="error">{errorUpdateDocument}</p>
-            )}
-            {/* {formError && <p className='error'>{formError}</p>} */}
           </form>
         </>
       )}

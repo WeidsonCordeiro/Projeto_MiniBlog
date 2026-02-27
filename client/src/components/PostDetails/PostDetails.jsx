@@ -5,14 +5,16 @@ import { Link } from "react-router-dom";
 import styles from "../PostDetails/PostDetails.module.css";
 
 const PostDetails = ({ post }) => {
-  console.log(post);
   return (
     <div className={styles.post_detail}>
-      <img src={post.image} alt={post.title} />
+      <img
+        src={`${import.meta.env.VITE_API_URL}${"/uploads/posts/"}${post.img}`}
+        alt={post.title}
+      />
       <h2>{post.title}</h2>
       <p className={styles.createdBy}>{post.createdBy}</p>
       <div className={styles.tags}>
-        {post.tagsArray.map((tag) => (
+        {post.tags.map((tag) => (
           <p key={tag}>
             <span>#</span>
             {tag}

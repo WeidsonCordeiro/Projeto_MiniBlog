@@ -1,23 +1,37 @@
 .editPost {
-    text-align: center;
+  text-align: center;
 }
 
 .editPost h2 {
-    font-size: 2.2em;
+  font-size: 2.2em;
 }
 
 .titlePost {
-    color: #AAA;
-    margin-bottom: 2em;
+  color: #aaa;
+  margin-bottom: 2em;
 }
 
 .editPost .preview_title {
-    margin-bottom: 0.2em;
-    color: #000;
-    font-weight: bold;
+  margin-bottom: 1em;
+  color: #000;
+  font-weight: bold;
 }
 
 .preview_image {
-    max-width: 100%;
-    margin-bottom: 1em;
+  width: 100%;
+  margin-bottom: 1em;
+}
+
+.loading {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(2px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
 }

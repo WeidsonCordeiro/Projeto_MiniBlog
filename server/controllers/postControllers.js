@@ -37,7 +37,6 @@ const updatePost = async (req, res) => {
   try {
     const postId = req.params.id;
     const { title, body, tags } = req.body;
-    const img = req.file ? req.file.filename : null;
 
     const postRef = db.collection("posts").doc(postId);
     const postSnap = await postRef.get();
@@ -55,7 +54,7 @@ const updatePost = async (req, res) => {
     }
 
     // Ensure there is something to update
-    if (!title && !body && !tags && !img) {
+    if (!title && !body && !tags) {
       return res
         .status(400)
         .json({ errors: ["Nenhuma informação foi enviada para atualizar!"] });
@@ -65,7 +64,6 @@ const updatePost = async (req, res) => {
       title,
       body,
       tags,
-      img,
     });
 
     await postRef.update(updateData);
@@ -180,7 +178,7 @@ const getMyPosts = async (req, res) => {
       .where("userId", "==", req.user.uid)
       .orderBy("createdAt", "desc")
       .get();
-    console.log(req.user.uid);
+
     const posts = snapshot.docs.map((doc) => ({
       id: doc.id,
       ...doc.data(),
@@ -199,6 +197,46 @@ const getMyPosts = async (req, res) => {
   }
 };
 
+const getPostsByName = async (req, res) => {
+  try {
+    const searchQuery = req.query.q || "";
+
+    if (!searchQuery.trim()) {
+      return res.status(400).json({
+        errors: ["Parâmetro de busca é obrigatório."],
+      });
+    }
+
+    const snapshot = await db
+      .collection("posts")
+      .orderBy("createdAt", "desc")
+      .get();
+
+    const posts = snapshot.docs
+      .map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }))
+      .filter((post) =>
+        post.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+      );
+
+    if (posts.length === 0) {
+      return res.status(200).json({
+        posts: [],
+        total: 0,
+        message: "Nenhum post encontrado.",
+      });
+    }
+  } catch (error) {
+    console.error("Erro ao buscar Posts por nome:", error);
+    return res.status(500).json({
+      errors: ["Erro ao buscar Posts por nome!"],
+      details: error.message,
+    });
+  }
+};
+
 module.exports = {
   setPost,
   updatePost,
@@ -206,4 +244,5 @@ module.exports = {
   getAllPosts,
   getPostById,
   getMyPosts,
+  getPostsByName,
 };

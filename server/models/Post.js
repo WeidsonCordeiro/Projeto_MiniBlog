@@ -10,13 +10,12 @@ class Post {
       createdAt: new Date(),
     };
   }
-  static buildUpdate({ title, img, body, tags }) {
+  static buildUpdate({ title, body, tags }) {
     const updateData = {};
 
     if (title) updateData.title = title;
     if (body) updateData.body = body;
     if (tags) updateData.tags = tags;
-    if (img) updateData.img = img;
 
     updateData.updatedAt = new Date();
 

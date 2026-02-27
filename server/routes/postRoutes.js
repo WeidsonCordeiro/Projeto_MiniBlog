@@ -9,6 +9,7 @@ const {
   getAllPosts,
   getPostById,
   getMyPosts,
+  getPostsByName,
 } = require("../controllers/postControllers");
 
 //Middleware
@@ -22,17 +23,19 @@ const {
 
 //Routes
 router.post(
-  "/register",
+  "/newPost",
   autGuard,
   imageUpload.single("img"),
   postPhotoInsertValidation(),
   validate,
   setPost,
 );
+
 router.get("/", validate, getAllPosts);
 router.get("/myPosts", autGuard, validate, getMyPosts);
+router.get("/search", validate, getPostsByName);
 router.put("/:id", autGuard, postPhotoUpdateValidation(), validate, updatePost);
 router.delete("/:id", autGuard, deletePost);
-router.get("/:id", autGuard, validate, getPostById);
+router.get("/:id", validate, getPostById);
 
 module.exports = router;

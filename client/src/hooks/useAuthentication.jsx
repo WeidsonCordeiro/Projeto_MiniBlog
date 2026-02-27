@@ -33,22 +33,27 @@ export const useAuthentication = () => {
     try {
       const { user } = await createUserWithEmailAndPassword(
         auth,
-        data.displayEmail,
-        data.displayPassWord
+        data.email,
+        data.passWord,
       );
-      await updateProfile(user, { displayName: data.displayName });
+      await updateProfile(user, { displayName: data.name });
+
       return user;
     } catch (error) {
-      let systemErrorMessage;
-      console.error(error.message);
-      if (error.message.includes("Password")) {
-        systemErrorMessage = "A Senha deve ter no mínimo 6 caracteres";
-      } else if (error.message.includes("email-already")) {
-        systemErrorMessage = "Email já cadastrado";
-      } else {
-        systemErrorMessage = "Ocorreu um erro ao cadastrar o usuário";
-      }
-      setError(systemErrorMessage);
+      console.error("Erro no registo:", error.code);
+
+      const errorMessages = {
+        "auth/weak-password": "A senha deve ter no mínimo 6 caracteres",
+        "auth/email-already-in-use": "Email já cadastrado",
+        "auth/invalid-email": "Email inválido",
+        "auth/operation-not-allowed": "Operação não permitida",
+        // Adicione outros códigos de erro conforme necessário
+      };
+
+      setError(
+        errorMessages[error.code] ||
+          "Ocorreu um erro ao registar o usuário, tente novamente",
+      );
     } finally {
       setLoading(false);
     }
@@ -67,18 +72,7 @@ export const useAuthentication = () => {
       const { user } = await signInWithEmailAndPassword(
         auth,
         data.email,
-        data.passWord
-      );
-
-      const token = await auth.currentUser.getIdToken(true); // força refresh
-      console.log(token);
-
-      localStorage.setItem(
-        "user",
-        JSON.stringify({
-          name: user.displayName,
-          token: token,
-        })
+        data.passWord,
       );
 
       return user;
@@ -93,7 +87,7 @@ export const useAuthentication = () => {
 
       setError(
         errorMessages[error.code] ||
-          "Ocorreu um erro ao buscar o usuário, tente novamente"
+          "Ocorreu um erro ao buscar o usuário, tente novamente",
       );
       return null;
     } finally {
@@ -108,8 +102,8 @@ export const useAuthentication = () => {
 
     try {
       await signOut(auth);
-      localStorage.removeItem("user");
     } catch (error) {
+      console.error("Erro no logout:", error.code);
       setError(error.message);
     } finally {
       setLoading(false);
