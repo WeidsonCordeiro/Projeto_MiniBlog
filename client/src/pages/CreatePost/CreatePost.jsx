@@ -126,13 +126,13 @@ const CreatePost = () => {
     }
 
     // Listando o conteúdo do FormData
-    for (let [key, value] of formData.entries()) {
-      if (value instanceof File) {
-        console.log(`${key}: ${value.name}`);
-      } else {
-        console.log(`${key}: ${value}`);
-      }
-    }
+    // for (let [key, value] of formData.entries()) {
+    //   if (value instanceof File) {
+    //     console.log(`${key}: ${value.name}`);
+    //   } else {
+    //     console.log(`${key}: ${value}`);
+    //   }
+    // }
 
     const token = getToLocalStorage("user")?.token;
     const config = requestConfig("POST", formData, token);
