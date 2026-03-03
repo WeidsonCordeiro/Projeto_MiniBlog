@@ -102,14 +102,6 @@ const CreatePost = () => {
       .map((tag) => tag.trim().toLowerCase())
       .filter((tag) => tag !== "");
 
-    const post = {
-      title,
-      body,
-      tags: tagsArray,
-      userId: user.userId,
-      createdBy: user.name,
-    };
-
     const formData = new FormData();
 
     formData.append("title", title);
