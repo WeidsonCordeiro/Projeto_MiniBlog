@@ -54,10 +54,7 @@ const Post = () => {
       {post && post.tags && (
         <>
           <h1>{post.title}</h1>
-          <img
-            src={`${import.meta.env.VITE_API_URL}${"/uploads/posts/"}${post.img}`}
-            alt={post.title}
-          />
+          <img src={post.img} alt={post.title} />
           <p>{post.body}</p>
           <h3>Este post trata sobre:</h3>
           <div className={styles.tags}>

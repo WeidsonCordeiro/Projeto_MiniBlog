@@ -7,10 +7,7 @@ import styles from "../PostDetails/PostDetails.module.css";
 const PostDetails = ({ post }) => {
   return (
     <div className={styles.post_detail}>
-      <img
-        src={`${import.meta.env.VITE_API_URL}${"/uploads/posts/"}${post.img}`}
-        alt={post.title}
-      />
+      <img src={post.img} alt={post.title} />
       <h2>{post.title}</h2>
       <p className={styles.createdBy}>{post.createdBy}</p>
       <div className={styles.tags}>
