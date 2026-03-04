@@ -26,8 +26,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ errors: [err.message] });
 });
 
-// app.listen(port, () => {
-//   console.log(`🚀 Server run in http://localhost:${port}`);
-// });
+if (process.env.NODE_ENV !== "production") {
+  app.listen(port, () => {
+    console.log(`🚀 Server run in http://localhost:${port}`);
+  });
+}
 
 module.exports = app;

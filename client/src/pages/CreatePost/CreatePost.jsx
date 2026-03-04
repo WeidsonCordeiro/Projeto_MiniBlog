@@ -6,6 +6,9 @@ import { useAuth } from "../../hooks/useAuth";
 //Utils
 import { requestConfig, getToLocalStorage } from "../../../utils/config";
 
+//Material UI
+import { CircularProgress } from "@mui/material";
+
 //Css
 import styles from "./CreatePost.module.css";
 
@@ -62,7 +65,6 @@ const CreatePost = () => {
       setTags("");
     };
 
-    setLoading(true);
     setError("");
 
     let validationErrors = {};
@@ -129,6 +131,7 @@ const CreatePost = () => {
     const token = getToLocalStorage("user")?.token;
     const config = requestConfig("POST", formData, token);
     try {
+      setLoading(true);
       const res = await fetch(`/api/posts/newPost`, config);
       const result = await res.json();
 
@@ -154,6 +157,11 @@ const CreatePost = () => {
       <p className={styles.titlePost}>
         Escreva sobre o que quiser e compartilhe o seu conhecimento!
       </p>
+      {loading && (
+        <div className={styles.loading}>
+          <CircularProgress color="black" size={40} />
+        </div>
+      )}
       <form onSubmit={handleSubmit} noValidate>
         <label>
           <span>Título:</span>
@@ -245,6 +253,7 @@ const CreatePost = () => {
             Aguarde...
           </button>
         )}
+        {error && <p className="error">{error[0]}</p>}
       </form>
     </div>
   );

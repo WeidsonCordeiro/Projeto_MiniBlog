@@ -30,7 +30,8 @@
 }
 
 .posts_grid {
-  width: 100%;
+  margin: auto;
+  width: 90%;
 }
 
 .loading {
