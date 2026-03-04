@@ -124,9 +124,9 @@ const deletePost = async (req, res) => {
         .json({ errors: ["Você não tem permissão para remover este Post!"] });
     }
 
-    // Deleta imagem no Cloudinary
-    if (postData.public_id) {
-      await cloudinary.uploader.destroy(postData.public_id);
+    //Deleta imagem no Cloudinary
+    if (postData.publicId) {
+      await cloudinary.uploader.destroy(postData.publicId);
     }
 
     await postRef.delete();
