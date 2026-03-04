@@ -7,7 +7,9 @@ A aplicação utiliza **Firebase** para autenticação e banco de dados, e **Clo
 
 ## 📸 Prévia da Aplicação
 
-![alt text](image.png)
+<p align="center">
+ <img width="1562" height="853" alt="image" src="https://github.com/user-attachments/assets/b7986f5b-72de-479b-9e85-f5348149781c" />
+</p>
 
 ## 🚀 Tecnologias Utilizadas
 
