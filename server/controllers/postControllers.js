@@ -252,6 +252,13 @@ const getPostsByName = async (req, res) => {
         message: "Nenhum post encontrado.",
       });
     }
+
+    if (posts.length > 0) {
+      return res.status(200).json({
+        posts,
+        total: posts.length,
+      });
+    }
   } catch (error) {
     console.error("Erro ao buscar Posts por nome:", error);
     return res.status(500).json({

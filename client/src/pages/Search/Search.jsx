@@ -20,7 +20,7 @@ const Search = () => {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
   const query = useQuery();
-  const search = query.get("q");
+  const search = query.get("q").trim();
 
   useEffect(() => {
     const fetchPosts = async () => {
@@ -31,7 +31,7 @@ const Search = () => {
       try {
         const res = await fetch(
           `/api/posts/search?q=${encodeURIComponent(search)}`,
-          config,
+          config
         );
         const result = await res.json();
 
@@ -40,6 +40,7 @@ const Search = () => {
           setError(result.errors);
           return;
         }
+        console.log("Posts encontrados:", result.posts);
         setPosts(result.posts);
       } catch (error) {
         console.error("Erro ao buscar posts por nome:", error);
@@ -50,7 +51,7 @@ const Search = () => {
     };
     fetchPosts();
   }, []);
-
+  console.log("Posts:", posts);
   return (
     <div className={styles.search_container}>
       <h2>Search</h2>
