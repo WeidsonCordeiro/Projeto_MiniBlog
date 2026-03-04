@@ -1,16 +1,36 @@
 const Post = require("../models/Post");
 const { db } = require("../config/firebase");
-const deleteImage = require("../utils/deleteImage");
+const cloudinary = require("../utils/cloudinary");
 
 //Register Post
 const setPost = async (req, res) => {
   try {
     const { title, body, tags } = req.body;
-    const img = req.file ? req.file.filename : null;
+
+    let imageUrl = null;
+    let publicId = null;
+
+    if (req.file) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "miniblog/posts" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+
+        stream.end(req.file.buffer);
+      });
+
+      imageUrl = uploadResult.secure_url;
+      publicId = uploadResult.public_id;
+    }
 
     const newPost = Post.build({
       title,
-      img,
+      img: imageUrl,
+      publicId,
       body,
       tags,
       userId: req.user.uid,
@@ -104,7 +124,11 @@ const deletePost = async (req, res) => {
         .json({ errors: ["Você não tem permissão para remover este Post!"] });
     }
 
-    await deleteImage("posts", postData.img);
+    // Deleta imagem no Cloudinary
+    if (postData.public_id) {
+      await cloudinary.uploader.destroy(postData.public_id);
+    }
+
     await postRef.delete();
 
     res.status(200).json({
@@ -218,7 +242,7 @@ const getPostsByName = async (req, res) => {
         ...doc.data(),
       }))
       .filter((post) =>
-        post.title?.toLowerCase().includes(searchQuery.toLowerCase()),
+        post.title?.toLowerCase().includes(searchQuery.toLowerCase())
       );
 
     if (posts.length === 0) {

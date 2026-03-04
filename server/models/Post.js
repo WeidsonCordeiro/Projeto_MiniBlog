@@ -1,8 +1,9 @@
 class Post {
-  static build({ title, img, body, tags, userId, createdBy }) {
+  static build({ title, img, publicId, body, tags, userId, createdBy }) {
     return {
       title,
       img,
+      publicId,
       body,
       tags: tags || [],
       userId,

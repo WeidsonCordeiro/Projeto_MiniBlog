@@ -158,7 +158,7 @@ const EditPost = () => {
             <p className={styles.preview_title}>Preview da imagem atual!</p>
             <img
               className={styles.preview_image}
-              src={`${import.meta.env.VITE_API_URL}${"/uploads/posts/"}${imagePreview}`}
+              src={imagePreview}
               alt={post.title}
             />
             <label>
