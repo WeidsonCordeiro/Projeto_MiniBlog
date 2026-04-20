@@ -42,6 +42,10 @@ A aplicação utiliza **Firebase** para autenticação e banco de dados, e **Clo
 
 - Falta implementar
 
+5. 📱 **Troca de Senha**
+
+- Falta implementar
+
 ## 🛠️ Pré-requisitos
 
 Antes de começar, certifique-se de ter as seguintes ferramentas instaladas em sua máquina:
