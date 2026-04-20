@@ -42,7 +42,7 @@ A aplicação utiliza **Firebase** para autenticação e banco de dados, e **Clo
 
 - Falta implementar
 
-5. 📱 **Troca de Senha**
+5. 🔐 **Troca de Senha**
 
 - Falta implementar
 
