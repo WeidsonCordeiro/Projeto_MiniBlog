@@ -3,15 +3,15 @@ const { body } = require("express-validator");
 const postPhotoInsertValidation = () => {
   return [
     body("title")
-      .not()
-      .equals("undefined")
+      .trim()
+      .notEmpty()
       .withMessage("A descrição é obrigatória!")
       .bail()
       .isLength({ min: 3 })
       .withMessage("A descrição deve ter pelo menos 3 caracteres!"),
     body("body")
-      .not()
-      .equals("undefined")
+      .trim()
+      .notEmpty()
       .withMessage("O corpo do post é obrigatório!")
       .bail()
       .isString()
@@ -31,16 +31,16 @@ const postPhotoInsertValidation = () => {
 const postPhotoUpdateValidation = () => {
   return [
     body("title")
-      .not()
-      .equals("undefined")
+      .trim()
+      .notEmpty()
       .withMessage("A descrição é obrigatória!")
       .bail()
       .isLength({ min: 3 })
       .withMessage("A descrição deve ter pelo menos 3 caracteres!")
       .optional(),
     body("body")
-      .not()
-      .equals("undefined")
+      .trim()
+      .notEmpty()
       .withMessage("O corpo do post é obrigatório!")
       .bail()
       .isString()
