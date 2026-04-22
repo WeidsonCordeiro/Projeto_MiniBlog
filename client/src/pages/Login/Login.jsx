@@ -3,12 +3,17 @@ import { useState, useEffect } from "react";
 import { useAuthentication } from "../../hooks/useAuthentication";
 import { validateEmail } from "../../hooks/useValidationEmail";
 
+//Material UI
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
+
 //CSS
 import styles from "./Login.module.css";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [passWord, setPassWord] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [errorMessage, setErrorMessage] = useState({});
   const { login, error: authenticationError, loading } = useAuthentication();
@@ -76,13 +81,25 @@ const Login = () => {
         )}
         <label>
           <span>Senha:</span>
-          <input
-            type="password"
-            name="passWord"
-            placeholder="Senha do Usuário"
-            value={passWord}
-            onChange={(e) => setPassWord(e.target.value)}
-          />
+
+          <div className={styles.inputWrapper}>
+            <input
+              type={showPassword ? "text" : "password"}
+              name="passWord"
+              placeholder="Senha do Usuário"
+              value={passWord}
+              onChange={(e) => setPassWord(e.target.value)}
+            />
+
+            <span
+              className={`${styles.visibilityIcon} ${
+                showPassword ? styles.active : ""
+              }`}
+              onClick={() => setShowPassword((prev) => !prev)}
+            >
+              {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
+            </span>
+          </div>
         </label>
         {errorMessage.passWord && (
           <div className="errormsg">
