@@ -39,11 +39,11 @@ A aplicação utiliza **Firebase** para autenticação e banco de dados, e **Clo
 - Gerenciamento dos posts criados pelo usuário autenticado
 
 4. 🚧 Melhorias Futuras
-- 📱 Responsividade completa
-- 🔐 troca de senhas
-- 🔔 Notificações
-- 🔎 Busca avançada
-- 🧑‍🤝‍🧑 Sistema de seguidores
+- 📱 **Responsividade completa usando o Bootstrap**
+- 🔐 **troca de senhas**
+- 🔔 **Notificações**
+- 🔎 **Busca avançada**
+- 🧑‍🤝‍🧑 **Sistema de seguidores**
 
 ## 🛠️ Pré-requisitos
 
